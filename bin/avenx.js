@@ -29,6 +29,8 @@ class AvenxCLI {
             case 'g':
                 if (type === 'bridge') {
                     this.generateBridge(name);
+                } else if (type === 'page' || type === 'p') {
+                    this.generatePage(name);
                 } else {
                     // Default to component if only one arg or type is 'component'
                     this.generateComponent(name || type);
@@ -54,6 +56,7 @@ class AvenxCLI {
         console.log('🚀 Initializing new Avenx-JS project...');
         const dirs = [
             'src/components',
+            'src/pages',
             'src/global',
             'dist',
             '.vscode'
@@ -135,6 +138,44 @@ class AvenxCLI {
 
         console.log(`✅ Bridge '${capitalizedName}' generated at src/global/${lowerName}.bridge.js`);
         console.log(`ℹ️ It will be automatically registered as '${capitalizedName}' on the next build.`);
+    }
+
+    /**
+     * Generates a new Page class and template files.
+     */
+    generatePage(name) {
+        if (!name) {
+            console.error('❌ Error: Please provide a page name (e.g., avenx g page home)');
+            return;
+        }
+
+        const lowerName = name.toLowerCase();
+        const capitalizedName = lowerName
+            .split(/[-_]/)
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+            .join('');
+        
+        const pageDir = path.join(this.baseDir, 'src/pages');
+        if (!fs.existsSync(pageDir)) {
+            fs.mkdirSync(pageDir, { recursive: true });
+        }
+
+        const jsPath = path.join(pageDir, `${lowerName}.page.js`);
+        const cssPath = path.join(pageDir, `${lowerName}.page.css`);
+
+        if (fs.existsSync(jsPath)) {
+            console.error(`❌ Error: Page '${lowerName}' already exists.`);
+            return;
+        }
+
+        const jsTemplate = fs.readFileSync(path.join(this.frameworkDir, 'templates/page/page.js.template'), 'utf-8');
+        const cssTemplate = fs.readFileSync(path.join(this.frameworkDir, 'templates/page/page.css.template'), 'utf-8');
+
+        fs.writeFileSync(jsPath, jsTemplate.replace(/{{ name }}/g, capitalizedName));
+        fs.writeFileSync(cssPath, cssTemplate);
+
+        console.log(`✅ Page '${capitalizedName}' generated at src/pages/${lowerName}.page.js`);
+        console.log(`ℹ️ It will be automatically registered and routed if you update src/main.app.js.`);
     }
 
     /**
@@ -335,6 +376,7 @@ Usage: avenx <command> [type] [name]
 Commands:
   init                      Initialize a new Avenx project structure
   generate component <name> Generate a new component (alias: g)
+  generate page <name>      Generate a new page (alias: g p)
   generate bridge <name>    Generate a new shared reactive bridge
   build                     Build the project into dist/bundle.js
   serve [port]              Start dev server with hot-reload (default: 3000)

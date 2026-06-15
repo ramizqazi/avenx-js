@@ -1,0 +1,6 @@
+<@css>
+.page-container {
+    padding: 20px;
+    font-family: sans-serif;
+}
+</ @css>
