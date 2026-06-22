@@ -29,6 +29,8 @@ class AvenxCLI {
             case 'g':
                 if (type === 'bridge') {
                     this.generateBridge(name);
+                } else if (type === 'guard') {
+                    this.generateGuard(name);
                 } else if (type === 'page' || type === 'p') {
                     this.generatePage(name);
                 } else {
@@ -58,6 +60,7 @@ class AvenxCLI {
             'src/components',
             'src/pages',
             'src/global',
+            'src/guards',
             'dist',
             '.vscode'
         ];
@@ -138,6 +141,44 @@ class AvenxCLI {
 
         console.log(`✅ Bridge '${capitalizedName}' generated at src/global/${lowerName}.bridge.js`);
         console.log(`ℹ️ It will be automatically registered as '${capitalizedName}' on the next build.`);
+    }
+
+    /**
+     * Generates a new Guard class and template file.
+     */
+    generateGuard(name) {
+        if (!name) {
+            console.error('❌ Error: Please provide a guard name (e.g., avenx g guard auth)');
+            return;
+        }
+
+        const lowerName = name.toLowerCase();
+        const capitalizedName = lowerName
+            .split(/[-_]/)
+            .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+            .join('') + "Guard";
+        
+        const guardDir = path.join(this.baseDir, 'src/guards');
+        if (!fs.existsSync(guardDir)) {
+            fs.mkdirSync(guardDir, { recursive: true });
+        }
+
+        const guardPath = path.join(guardDir, `${lowerName}.guard.js`);
+
+        if (fs.existsSync(guardPath)) {
+            console.error(`❌ Error: Guard '${lowerName}' already exists.`);
+            return;
+        }
+
+        const template = fs.readFileSync(path.join(this.frameworkDir, 'templates/guard/guard.js.template'), 'utf-8');
+
+        fs.writeFileSync(
+            guardPath,
+            template.replace(/{{ name }}/g, capitalizedName)
+        );
+
+        console.log(`✅ Guard '${capitalizedName}' generated at src/guards/${lowerName}.guard.js`);
+        console.log(`ℹ️ It can be used in your route configurations.`);
     }
 
     /**
@@ -423,6 +464,7 @@ Commands:
   generate component <name> Generate a new component (alias: g)
   generate page <name>      Generate a new page (alias: g p)
   generate bridge <name>    Generate a new shared reactive bridge
+  generate guard <name>     Generate a new route guard
   build                     Build the project into dist/bundle.js
   serve [port]              Start dev server with hot-reload (default: 3000)
   help                      Show this help message
