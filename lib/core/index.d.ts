@@ -349,6 +349,15 @@ export class HtmlEscaper {
     escape(str: string): string;
 }
 
+export class SafeHtml {
+    value: string;
+    constructor(value: any);
+    toString(): string;
+}
+
+export function html(strings: string | TemplateStringsArray, ...values: any[]): SafeHtml;
+
 export class Sanitizer {
     sanitize(html: string): string;
 }
+

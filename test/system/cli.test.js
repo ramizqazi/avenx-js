@@ -53,6 +53,21 @@ function runTest() {
 
         console.log('✅ All init tests passed!');
 
+        console.log('🧪 Testing avenx build...');
+        execSync(`node ${BIN_PATH} build`, { cwd: TEST_DIR });
+        
+        const bundleJsPath = path.join(TEST_DIR, 'dist/bundle.js');
+        const bundleCssPath = path.join(TEST_DIR, 'dist/bundle.css');
+        assert.ok(fs.existsSync(bundleJsPath), 'Missing bundle.js');
+        assert.ok(fs.existsSync(bundleCssPath), 'Missing bundle.css');
+        
+        const bundleContent = fs.readFileSync(bundleJsPath, 'utf-8');
+        assert.ok(bundleContent.includes('class HtmlEscaper'), 'bundle.js should contain HtmlEscaper');
+        assert.ok(bundleContent.includes('class SafeHtml'), 'bundle.js should contain SafeHtml');
+        assert.ok(bundleContent.includes('function html('), 'bundle.js should contain html function');
+        
+        console.log('✅ All build tests passed!');
+
     } catch (error) {
         console.error('❌ Test failed!');
         console.error(error);
