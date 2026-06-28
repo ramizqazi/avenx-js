@@ -12,6 +12,10 @@ const [, , command, ...args] = process.argv;
  * Avenx CLI - Command Line Interface for Avenx-JS.
  */
 class AvenxCLI {
+    /**
+     * Creates an instance of AvenxCLI.
+     * Initializes the base directory and framework directory paths.
+     */
     constructor() {
         this.baseDir = process.cwd();
         this.frameworkDir = path.join(__dirname, '..');
@@ -43,6 +47,12 @@ class AvenxCLI {
         return fs.readFileSync(globalPath, 'utf-8');
     }
 
+    /**
+     * Executes a given CLI command with provided arguments.
+     * 
+     * @param {string} command - The command to run (e.g., 'init', 'generate', 'build', 'serve', 'help').
+     * @param {string[]} args - Additional arguments for the command.
+     */
     run(command, args) {
         const type = args[0];
         const name = args[1];
@@ -467,6 +477,11 @@ class AvenxCLI {
         exec(`${start} ${url}`);
     }
 
+    /**
+     * Generates the default index.html template content.
+     * 
+     * @returns {string} The initial HTML template string.
+     */
     getInitialHtml() {
         return `<!DOCTYPE html>
 <html>
@@ -481,6 +496,9 @@ class AvenxCLI {
 </html>`;
     }
 
+    /**
+     * Prints the help message with available commands to the console.
+     */
     printHelp() {
         console.log(`
 Avenx-JS CLI
